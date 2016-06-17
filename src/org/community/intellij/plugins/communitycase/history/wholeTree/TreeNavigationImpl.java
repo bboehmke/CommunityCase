@@ -5,7 +5,6 @@ import com.intellij.openapi.vcs.Ring;
 import com.intellij.util.Consumer;
 import com.intellij.util.containers.BidirectionalMap;
 import com.intellij.util.containers.Convertor;
-import com.intellij.util.containers.ReadonlyList;
 
 import java.util.*;
 
@@ -32,7 +31,7 @@ public class TreeNavigationImpl implements TreeNavigation, WireEventsListener {
     myMaximumWires = 0;
   }
 
-  public void recalcIndex(final ReadonlyList<CommitI> commits, final Convertor<Integer, List<Integer>> future) {
+  public void recalcIndex(final List<CommitI> commits, final Convertor<Integer, List<Integer>> future) {
     if (myWireEvents.isEmpty()) return;
     Integer lastIndexKey = myRingIndex.isEmpty() ? null : myRingIndex.lastKey();
     //System.out.println("=== recalc index from: " + lastIndexKey + " ====");
@@ -76,14 +75,14 @@ public class TreeNavigationImpl implements TreeNavigation, WireEventsListener {
   // todo write start immediately in event in form of hash
   // todo to be able to get it here, when building index
   // todo: problem: when doing index, we don't have "future commits" wires!
-  private void performOnRing(final Ring<Integer> ring, final WireEvent event, final ReadonlyList<CommitI> convertor,
+  private void performOnRing(final Ring<Integer> ring, final WireEvent event, final List<CommitI> convertor,
                              List<Integer> futureWireStarts) {
     final int[] wireEnds = event.getWireEnds();
     if (wireEnds != null) {
       for (int wireEnd : wireEnds) {
         int wireNumber = convertor.get(wireEnd).getWireNumber();
         if (ring.haveInFree(wireNumber)) {
-          System.out.println("assertion will rise here, commits size: " + convertor.getSize() + " event idx: " + event.getCommitIdx());
+          System.out.println("assertion will rise here, commits size: " + convertor.size() + " event idx: " + event.getCommitIdx());
         }
         //System.out.println("back(1): " + wireNumber + " from: " + event.getCommitIdx());
         ring.back(wireNumber);
@@ -130,7 +129,7 @@ public class TreeNavigationImpl implements TreeNavigation, WireEventsListener {
   }
 
   @Override
-  public Ring<Integer> getUsedWires(int row, ReadonlyList<CommitI> commits, final Convertor<Integer, List<Integer>> future) {
+  public Ring<Integer> getUsedWires(int row, List<CommitI> commits, final Convertor<Integer, List<Integer>> future) {
     final Map.Entry<Integer, RingIndex> entry = myRingIndex.floorEntry(row);
       if (entry == null) return new Ring.IntegerRing();
     final Ring<Integer> ring = entry.getValue().getUsedInRing();
@@ -239,7 +238,7 @@ public class TreeNavigationImpl implements TreeNavigation, WireEventsListener {
     }
   }
 
-  /*public void recountWires(final int fromIdx, final ReadonlyList<CommitI> commits) {
+  /*public void recountWires(final int fromIdx, final List<CommitI> commits) {
     final Map<Integer, Integer> recalculateMap = new HashMap<Integer, Integer>();
 
     //final Iterator<WireEvent> backIterator = createWireEventsBackIterator(fromIdx);
@@ -298,7 +297,7 @@ public class TreeNavigationImpl implements TreeNavigation, WireEventsListener {
     return myMaximumWires;
   }
 
-  private void recountFragmentZwichem(ReadonlyList<CommitI> commits,
+  private void recountFragmentZwichem(List<CommitI> commits,
                                       Map<Integer, Integer> recalculateMap,
                                       int runningCommitNumber,
                                       int inclusive) {

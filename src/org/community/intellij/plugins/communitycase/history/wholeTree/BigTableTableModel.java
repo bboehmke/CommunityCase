@@ -1,13 +1,9 @@
 package org.community.intellij.plugins.communitycase.history.wholeTree;
 
-import com.intellij.openapi.diff.impl.patch.formove.FilePathComparator;
-import com.intellij.openapi.vcs.BigArray;
 import com.intellij.openapi.vcs.GroupingMerger;
 import com.intellij.openapi.vcs.changes.committed.DateChangeListGroupingStrategy;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.containers.MultiMap;
-import com.intellij.util.containers.ReadonlyList;
-import com.intellij.util.containers.StepList;
 import com.intellij.util.ui.ColumnInfo;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -34,7 +30,7 @@ public class BigTableTableModel extends AbstractTableModel {
   private final List<ColumnInfo> myColumns;
   private RootsHolder myRootsHolder;
   @Nullable
-  private StepList<CommitI> myLines;
+  private List<CommitI> myLines;
   private int myCutCount;
   private DetailsCache myCache;
   private Runnable myInit;
@@ -60,7 +56,7 @@ public class BigTableTableModel extends AbstractTableModel {
         return delegate.getGroupName(new Date(commit.getTime()));
       }
     };
-    myLines = new BigArray<CommitI>(10);
+    myLines = new ArrayList<>(10);
     myCutCount = -1;
 
     myCommitIdxInterval = 50;
@@ -90,7 +86,7 @@ public class BigTableTableModel extends AbstractTableModel {
   }
 
   int getTrueCount() {
-    return myLines == null ? 0 : myLines.getSize();
+    return myLines == null ? 0 : myLines.size();
   }
 
   @Override
@@ -103,12 +99,12 @@ public class BigTableTableModel extends AbstractTableModel {
     if (myCutCount > 0) {
       return myCutCount;
     }
-    return myLines == null ? 0 : myLines.getSize();
+    return myLines == null ? 0 : myLines.size();
   }
 
   public CommitI getCommitAt(final int row) {
     if (myLines == null) return null;
-    if (row >= myLines.getSize()) return null;
+    if (row >= myLines.size()) return null;
     return myLines.get(row);
   }
 
@@ -219,7 +215,7 @@ public class BigTableTableModel extends AbstractTableModel {
       myNavigation = null;
       myOrder = null;
     //}
-    myLines = new BigArray<CommitI>(10);
+    myLines = new ArrayList<>(10);
     myCutCount = -1;
   }
 
@@ -246,6 +242,7 @@ public class BigTableTableModel extends AbstractTableModel {
     // find those ..... long awaited start idx by stupid long iteration since
     // items can NOT be ordered by simple rule
     int idxFrom = findIdx(lines);
+
 
     int recountFrom = new GroupingMerger<CommitI, String>() {
 
@@ -307,14 +304,14 @@ public class BigTableTableModel extends AbstractTableModel {
         // todo
         //System.out.println("old: " + was + " became: " + is);
       }
-    }.firstPlusSecond(myLines, new ReadonlyList.ArrayListWrapper<CommitI>(lines), myCurrentComparator, mySkeletonBuilder == null ? -1 : idxFrom);
+    }.firstPlusSecond(myLines, new ArrayList<>(lines), myCurrentComparator, mySkeletonBuilder == null ? -1 : idxFrom);
 
     if (mySkeletonBuilder != null) {
       for (SkeletonBuilder skeletonBuilder : mySkeletonBuilder.values()) {
         skeletonBuilder.oldBecameNew(indexRecalculation);
       }
 
-      for (int i = recountFrom; i < myLines.getSize(); i++) {
+      for (int i = recountFrom; i < myLines.size(); i++) {
         final CommitI commitI = myLines.get(i);
         if (mySkeletonBuilder != null && ! commitI.holdsDecoration() && whatToRecount.contains(i)) {
           mySkeletonBuilder.get(commitI.selectRepository(myRootsHolder.getRoots())).consume(commitI, parents.get(parentsIdx[0]), myLines, i);
@@ -338,7 +335,7 @@ public class BigTableTableModel extends AbstractTableModel {
     final VirtualFile targetRepo = lines.get(0).selectRepository(myRootsHolder.getRoots());
     final long time = lines.get(0).getTime();
 
-    for (int i = myLines.getSize() - 1; i >= 0; i--) {
+    for (int i = myLines.size() - 1; i >= 0; i--) {
       final CommitI current = myLines.get(i);
       if (current.selectRepository(myRootsHolder.getRoots()).equals(targetRepo)) {
         return i + 1;      // will be equal to list size sometimes, is that ok?

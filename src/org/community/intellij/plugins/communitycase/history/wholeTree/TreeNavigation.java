@@ -2,7 +2,6 @@ package org.community.intellij.plugins.communitycase.history.wholeTree;
 
 import com.intellij.openapi.vcs.Ring;
 import com.intellij.util.containers.Convertor;
-import com.intellij.util.containers.ReadonlyList;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Iterator;
@@ -20,6 +19,6 @@ public interface TreeNavigation {
    * @return pair: idx of closest commit with ring recorded; ring - ring for that commit
    */
   @Nullable
-  Ring<Integer> getUsedWires(int row, ReadonlyList<CommitI> commits, final Convertor<Integer, List<Integer>> future);
+  Ring<Integer> getUsedWires(int row, List<CommitI> commits, final Convertor<Integer, List<Integer>> future);
   Iterator<WireEvent> createWireEventsIterator(int rowInclusive);
 }

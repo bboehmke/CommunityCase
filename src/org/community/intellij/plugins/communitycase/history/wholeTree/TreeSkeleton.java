@@ -15,10 +15,11 @@
  */
 package org.community.intellij.plugins.communitycase.history.wholeTree;
 
-import com.intellij.util.containers.ReadonlyList;
+
+import java.util.List;
 
 /**
  * @author irengrig
  */
-public interface TreeSkeleton extends ReadonlyList<VisibleLine>, TreeNavigation {
+public interface TreeSkeleton extends List<VisibleLine>, TreeNavigation {
 }

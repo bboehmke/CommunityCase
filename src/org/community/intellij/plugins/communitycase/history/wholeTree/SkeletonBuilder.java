@@ -5,7 +5,6 @@ import com.intellij.util.SmartList;
 import com.intellij.util.containers.BidirectionalMap;
 import com.intellij.util.containers.Convertor;
 import com.intellij.util.containers.MultiMap;
-import com.intellij.util.containers.ReadonlyList;
 
 import java.util.*;
 
@@ -40,7 +39,7 @@ public class SkeletonBuilder {
     };
   }
 
-  public void consume(final CommitI commitI, final List<AbstractHash> parents, final ReadonlyList<CommitI> commits, final int rowCount) {
+  public void consume(final CommitI commitI, final List<AbstractHash> parents, final List<CommitI> commits, final int rowCount) {
     int wireNumber = -1;
 
     // will become real!
